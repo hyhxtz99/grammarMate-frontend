@@ -1,62 +1,132 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './GrammarQA.css';
 
-const GrammarQA = () => {
+const STORAGE_KEY = 'grammar_qa_chat_history';
+
+function getInitialMessages() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch {}
+  return [];
+}
+
+const GrammarQA = ({ selectedLanguage }) => {
   const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState(null);
+  const [messages, setMessages] = useState(getInitialMessages); // 初始化时从localStorage读取
   const [isLoading, setIsLoading] = useState(false);
+  const [translatingIdx, setTranslatingIdx] = useState(null); // 当前正在翻译的消息索引
+  const chatEndRef = useRef(null);
+  const prevMsgLenRef = useRef(messages.length);
 
-  const handleSubmit = async () => {
-    if (!question) {
-      alert('请输入问题');
-      return;
+  // 聊天记录变动时保存
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+  }, [messages]);
+
+  // 只有新消息加入时才滚动到底部
+  useEffect(() => {
+    if (messages.length > prevMsgLenRef.current) {
+      if (chatEndRef.current) {
+        chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
     }
+    prevMsgLenRef.current = messages.length;
+  }, [messages]);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!question.trim()) return;
+    const userMsg = { role: 'user', content: question };
+    setMessages((prev) => [...prev, userMsg]);
     setIsLoading(true);
+    setQuestion('');
     try {
       const response = await fetch('http://localhost:5000/api/grammar/qa', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ question })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: userMsg.content })
       });
       const data = await response.json();
-      setAnswer(data.answer);
+      let answerMsg = { role: 'assistant', content: data.answer };
+      // 如果需要翻译
+      if (selectedLanguage && selectedLanguage !== 'en') {
+        const transResp = await fetch('http://localhost:5000/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: data.answer, to_lang: selectedLanguage })
+        });
+        const transData = await transResp.json();
+        if (transData.translated_text) {
+          answerMsg = { ...answerMsg, translated: transData.translated_text };
+        }
+      }
+      setMessages((prev) => [...prev, answerMsg]);
     } catch (error) {
-      console.error('Error:', error);
-      alert('处理问题时出错');
+      setMessages((prev) => [...prev, { role: 'assistant', content: '处理问题时出错' }]);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // 单条消息翻译
+  const handleTranslate = async (idx) => {
+    setTranslatingIdx(idx);
+    try {
+      const msg = messages[idx];
+      const resp = await fetch('http://localhost:5000/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: msg.content, to_lang: selectedLanguage })
+      });
+      const data = await resp.json();
+      if (data.translated_text) {
+        setMessages((prev) => prev.map((m, i) => i === idx ? { ...m, translated: data.translated_text } : m));
+      }
+    } catch {}
+    setTranslatingIdx(null);
+  };
+
   return (
-    <div className="grammar-qa-container">
-      <h2>Grammar Q&A</h2>
-      
-      <div className="question-input">
+    <div className="chatgpt-qa-container">
+      <div className="chatgpt-qa-header">Grammar Q&A</div>
+      <div className="chatgpt-qa-messages">
+        {messages.map((msg, idx) => (
+          <div key={idx} className={`chatgpt-qa-message ${msg.role}`}> 
+            <div className="chatgpt-qa-avatar">{msg.role === 'user' ? '🧑' : '🤖'}</div>
+            <div className="chatgpt-qa-bubble">
+              {msg.content}
+              {msg.translated && (
+                <div className="qa-translation">{msg.translated}</div>
+              )}
+            </div>
+            {/* 仅AI回答显示翻译按钮，且未翻译时 */}
+            {msg.role === 'assistant' && !msg.translated  && (
+              <button
+                className="qa-translate-btn"
+                onClick={() => handleTranslate(idx)}
+                disabled={translatingIdx === idx}
+                style={{ marginLeft: 8 }}
+              >
+                {translatingIdx === idx ? '翻译中...' : '翻译'}
+              </button>
+            )}
+          </div>
+        ))}
+        <div ref={chatEndRef} />
+      </div>
+      <form className="chatgpt-qa-inputbar" onSubmit={handleSubmit}>
         <textarea
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="请输入您的语法问题..."
-        />
-        <button 
-          onClick={handleSubmit}
+          rows={1}
           disabled={isLoading}
-        >
-          {isLoading ? '处理中...' : '提交问题'}
+        />
+        <button type="submit" disabled={isLoading || !question.trim()}>
+          {isLoading ? '处理中...' : '发送'}
         </button>
-      </div>
-
-      {answer && (
-        <div className="answer-section">
-          <h3>回答：</h3>
-          <div className="answer-content">
-            {answer}
-          </div>
-        </div>
-      )}
+      </form>
     </div>
   );
 };

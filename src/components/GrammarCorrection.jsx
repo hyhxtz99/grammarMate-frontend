@@ -1,14 +1,13 @@
 import React, { useState, useRef } from 'react';
 import './GrammarCorrection.css';
 
-const GrammarCorrection = () => {
+const GrammarCorrection = ({ selectedLanguage }) => {
   const [text, setText] = useState('');
   const [result, setResult] = useState(null);
   const [isLoading, setLoading]=useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState('en'); // 👈 新增
   const [translatedResult, setTranslatedResult] = useState(null);
-  const socketRef = useRef(null);
+
   
 
   const startRecording = async () => {
@@ -18,26 +17,7 @@ const GrammarCorrection = () => {
       });
       if (response.ok) {
         setIsRecording(true);
-         // 建立 WebSocket 连接
-        socketRef.current = new WebSocket('ws://localhost:5000/ws/speech');
-
-        socketRef.current.onopen = () => {
-          console.log('📡 WebSocket connected');
-        };
-
-        socketRef.current.onmessage = (event) => {
-          const message = JSON.parse(event.data);
-          console.log('🎙️ receive real-time recognition results:', message.text);
-          setText(prevText => prevText + message.text + ' ');
-        };
-
-        socketRef.current.onerror = (error) => {
-          console.error('WebSocket error:', error);
-        };
-
-        socketRef.current.onclose = () => {
-          console.log('📴 WebSocket closed');
-        };
+       
       } else {
         const data = await response.json();
         alert(data.error || 'Unable to start recording');
@@ -60,9 +40,7 @@ const GrammarCorrection = () => {
       }
       setIsRecording(false);
       
-      if (socketRef.current) {
-        socketRef.current.close();
-      }
+     
     } catch (error) {
       console.error('Error:', error);
       alert('error stopping recording. Please try again.');
@@ -125,7 +103,7 @@ const GrammarCorrection = () => {
   return (
     <div className="grammar-container">
       <h2>Sentence Correction</h2>
-      
+     <div>Please wait for one second after the recording starts before speaking.</div> 
       
       <div className="speech-input">
         <button 
@@ -157,31 +135,8 @@ const GrammarCorrection = () => {
             {Array.isArray(result) ? result[0] : result}
           </div>
           <div  className="choose-to-translate">Translate to...</div>
-          <select name="language" 
-          id="language"
-          value={selectedLanguage}
-          onChange={(e) => setSelectedLanguage(e.target.value)}>
-            <option value="en">English</option>
-          <option value="zh-Hans">Chinese (Simplified)</option>
-          <option value="sw">Swahili</option>
-          <option value="ha">Hausa</option>
-          <option value="yo">Yoruba</option>
-          <option value="ig">Igbo</option>
-          <option value="fr">French</option>
-          <option value="es">Spanish</option>
-          <option value="pt">Portuguese</option>
-          <option value="ar">Arabic</option>
-          <option value="bn">Bengali</option>
-          <option value="hi">Hindi</option>
-          <option value="ne">Nepali</option>
-          <option value="my">Burmese</option>
-          <option value="km">Khmer</option>
-          <option value="lo">Lao</option>
-          <option value="am">Amharic</option>
-          <option value="om">Oromo</option>
-          <option value="rw">Kinyarwanda</option>
-          <option value="so">Somali</option>
-          <option value="ug">Uyghur</option>
+          <select name="language" id="language" value={selectedLanguage} disabled>
+            <option value={selectedLanguage}>{selectedLanguage}</option>
           </select>
           <button onClick={handleTranslate} className="translate">translate</button>
         {translatedResult &&
