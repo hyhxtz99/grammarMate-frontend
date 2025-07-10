@@ -1,32 +1,44 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 
 function Navbar() {
-  const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const toggleSubmenu = (e) => {
-    e.preventDefault();
-    setIsSubmenuOpen(!isSubmenuOpen);
+  const handleGrammarClick = () => {
+    // 如果当前不在grammar相关页面，则跳转到sentence correction
+    if (!location.pathname.startsWith('/grammar')) {
+      navigate('/grammar/correction');
+    }
   };
 
   return (
     <nav className="navbar">
-      <div className="nav-brand">
-        <h2>English Learning Assistant</h2>
-      </div>
+ 
       <ul className="nav-links">
-        <li className={`nav-item ${isSubmenuOpen ? 'active' : ''}`}>
-          <a href="#" onClick={toggleSubmenu} className="nav-link-with-arrow">
-            <span className="arrow">▼</span>Grammar Correction
-          </a>
-          <ul className={`submenu ${isSubmenuOpen ? 'show' : ''}`}>
-            <li><Link to="/grammar/correction">Sentence Correction</Link></li>
-            <li><Link to="/grammar/qa">Grammar Q&A</Link></li>
+        <li className={`home-page ${location.pathname === '/' ? 'active' : ''}`}>
+          <NavLink to="/" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Home</NavLink>
+        </li>
+        <li className={`grammar-correction ${location.pathname.startsWith('/grammar') ? 'active' : ''}`}>
+          <div 
+            className="grammar-header" 
+            onClick={handleGrammarClick}
+            style={{ cursor: 'pointer' }}
+          >
+            Grammar Correction
+          </div>
+          <ul className={`submenu`}>
+            <li className={location.pathname === '/grammar/correction' ? 'active' : ''}>
+              <NavLink to="/grammar/correction" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Sentence Correction</NavLink>
+            </li>
+            <li className={location.pathname === '/grammar/qa' ? 'active' : ''}>
+              <NavLink to="/grammar/qa" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Grammar Q&A</NavLink>
+            </li>
           </ul>
         </li>
-        <li className="pronunciation">
-          <Link to="/pronunciation">Pronounciation Correction</Link>
+        <li className={`pronunciation ${location.pathname === '/pronunciation' ? 'active' : ''}`}>
+          <NavLink to="/pronunciation" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Pronounciation Correction</NavLink>
         </li>
       </ul>
     </nav>

@@ -103,15 +103,19 @@ const GrammarCorrection = ({ selectedLanguage }) => {
   return (
     <div className="grammar-container">
       <h2>Sentence Correction</h2>
-     <div>Please wait for one second after the recording starts before speaking.</div> 
-      
+     
       <div className="speech-input">
-        <button 
-          className={`record-button ${isRecording ? 'recording' : ''}`}
-          onClick={isRecording ? stopRecording : startRecording}
-        >
-          {isRecording ? 'Stop recording' : 'Start recording'}
-        </button>
+        <div className="tooltip-wrapper">
+          <button 
+            className={`record-button ${isRecording ? 'recording' : ''}`}
+            onClick={isRecording ? stopRecording : startRecording}
+          >
+            {isRecording ? 'Stop recording' : 'Start recording'}
+          </button>
+          <span className="tooltip-text">
+            Please wait for one second after the recording starts before speaking.
+          </span>
+        </div>
         {isRecording && <div className="recording-status">Recording...</div>}
         
       </div>
@@ -122,7 +126,7 @@ const GrammarCorrection = ({ selectedLanguage }) => {
           onChange={(e) => setText(e.target.value)}
           placeholder="Please enter the text you want to check..."
         />
-        <button onClick={handleSubmit}>Check Grammar</button>
+        <button className='submit' onClick={handleSubmit}>Check Grammar</button>
       </div>
 
       {/* 结果显示部分 */}
@@ -130,18 +134,16 @@ const GrammarCorrection = ({ selectedLanguage }) => {
 
       {result && (
         <div className="result-section">
-          <h3>Checked results: (If you want a more detailed explanation about a grammar point, you can ask in the Q&A channel.)</h3>
+          <h3>Checked results: </h3>
           <div className="result-content">
             {Array.isArray(result) ? result[0] : result}
+           
           </div>
-          <div  className="choose-to-translate">Translate to...</div>
-          <select name="language" id="language" value={selectedLanguage} disabled>
-            <option value={selectedLanguage}>{selectedLanguage}</option>
-          </select>
-          <button onClick={handleTranslate} className="translate">translate</button>
-        {translatedResult &&
-        <p>{translatedResult}</p>
-        }
+          <h3> (If you want a more detailed explanation about a grammar point, you can ask in the Q&A channel.)</h3>
+          <button onClick={handleTranslate} className="translate">Translate to {selectedLanguage}</button>
+          {translatedResult &&
+            <p>{translatedResult}</p>
+          }
         </div>
       )}
     </div>
