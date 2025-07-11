@@ -119,12 +119,12 @@ const GrammarQA = ({ selectedLanguage }) => {
         <textarea
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          placeholder="请输入您的语法问题..."
+          placeholder="Please enter your questions here..."
           rows={1}
           disabled={isLoading}
         />
         <button type="submit" disabled={isLoading || !question.trim()}>
-          {isLoading ? '处理中...' : '发送'}
+          {isLoading ? 'Sending...' : 'Send'}
         </button>
       </form>
     </div>

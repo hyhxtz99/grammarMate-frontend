@@ -1,179 +1,60 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 .navbar {
   background-color: #3498db;
  
   min-width: 20vw;
   /* max-width :15vw; */
-  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+  font-size: clamp(1.4rem, 2.5vw, 1.5rem);
   color: white;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  /* 添加立体长方体效果 */
+
   border-radius: 0 15px 15px 0;
 
 }
 
 
-.nav-links {
+.nav-links  {
   list-style: none;
+  width: 100%;
   display: block;
   padding: 0;
   margin: 0;
   gap: 1rem;
 }
 
-.nav-links li {
-  position: relative;
-  width: 100%;
-  text-align: center;
-  transition: all 0.3s;
-  padding: 10px 0;
-
-
-}
-
-.nav-links li:hover{
-  /* background-color: white; */
-  color: yellow;
-}
-
-/* 禁用选中状态下的悬停效果 */
-.nav-links li.active:hover {
-  color: black;
-  background-color: white;
-}
-
-.nav-links li.active:hover a {
-  color: black;
-}
-
-.nav-links .home-page{
-  font-weight: bold;
-}
-
-.nav-link.active .home-page:hover{
-  color: #333;
-}
-
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  font-size: clamp(1rem, 1.6vw, 1.4rem);
-  display: block;
-  width: 100%;
-  margin:0 4px;
-
-  transition: all 0.3s;
-}
-
-.nav-links li:hover a {
-  color: yellow;
-}
-
-/* 选中状态的样式 */
-.nav-link.active {
- color: black;
-}
-
-
-/* 当li标签包含active的NavLink时，为li标签应用样式 */
-.nav-links li.active {
-  background-color: white;
-  color: black;
-}
-
-.grammar-correction {
-   font-size: large; 
-   
-   position: relative;
-   padding: 10px 20px;
-   cursor: pointer;
-   transition: all 0.3s;
-}
-
-.grammar-correction:hover{
-  color: #333;
-  /* background-color: white; */
-}
-
-/* 禁用grammar-correction选中状态下的悬停效果 */
-.grammar-correction.active:hover {
-  color: black;
-  background-color: white;
-}
-
-.grammar-correction .grammar-header{
-  font-weight: bold;
-}
-
-.submenu {
-
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  justify-content: center;
-  align-items: center;
-  padding: 0;
-  margin: 0;
-  background-color: transparent;
-  list-style-type: none;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-}
-
-.submenu li {
+.nav-links li{
  
-  gap: 5px;
-  text-align: center;
   width: 100%;
-}
-
-.submenu a {
+  text-align: center;
+  /* text-decoration: none; */
+  padding: 5px 3px;
   
-  font-size: clamp(1rem, 1.4vw, 1.2rem);
-  white-space: nowrap;
-  display: block;
-  width: 100%;
-  color: white;
+}
+
+.nav-links li a{
   text-decoration: none;
+  color: inherit;
+  transition: all 0.3s;
 }
 
-/* 子菜单选中状态 */
-.submenu .nav-link.active {
-  color: black;
- 
+.nav-links li.active{
+  color: #3498db;
+  background-color: white;
 }
 
-/* 当子菜单的li标签包含active的NavLink时，为li标签应用样式 */
-.submenu li.active {
-  background-color: whitesmoke;
-  color: black;
+.nav-links li:hover a{
+  color: #3498db;
+
+}
+.nav-links li:hover{
+  background-color: white;
 }
 
-/* 禁用子菜单选中状态下的悬停效果 */
-.submenu li.active:hover {
-  background-color: whitesmoke;
-  color: black;
-}
 
-.submenu li.active:hover a {
-  color: black;
-}
-
-.pronunciation {
-  margin-top: 8rem; 
- 
-  font-weight: bold; 
-} 
-
-.pronunciation:hover a{
- color: yellow;
-}
-
-/* 禁用pronunciation选中状态下的悬停效果 */
-.pronunciation.active:hover a {
-  color: black;
-}

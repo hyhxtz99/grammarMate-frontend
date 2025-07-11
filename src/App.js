@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import GrammarCorrection from './components/GrammarCorrection';
-import PronunciationCorrection from './components/PronunciationCorrection';
+
 import GrammarQA from './components/GrammarQA';
 import './App.css';
 
@@ -86,7 +86,7 @@ function App() {
             <Route path="/" element={<Home selectedLanguage={selectedLanguage} setSelectedLanguage={setSelectedLanguage} hasSelectedLanguage={hasSelectedLanguage} setHasSelectedLanguage={setHasSelectedLanguage} />} />
             <Route path="/grammar/correction" element={<GrammarCorrection selectedLanguage={selectedLanguage} />} />
             <Route path="/grammar/qa" element={<GrammarQA selectedLanguage={selectedLanguage} />} />
-            <Route path="/pronunciation" element={<PronunciationCorrection />} />
+            
           </Routes>
         </main>
       </div>

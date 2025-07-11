@@ -18,28 +18,17 @@ function Navbar() {
  
       <ul className="nav-links">
         <li className={`home-page ${location.pathname === '/' ? 'active' : ''}`}>
-          <NavLink to="/" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Home</NavLink>
+          <NavLink id='home' to="/" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Home</NavLink>
         </li>
-        <li className={`grammar-correction ${location.pathname.startsWith('/grammar') ? 'active' : ''}`}>
-          <div 
-            className="grammar-header" 
-            onClick={handleGrammarClick}
-            style={{ cursor: 'pointer' }}
-          >
-            Grammar Correction
-          </div>
-          <ul className={`submenu`}>
-            <li className={location.pathname === '/grammar/correction' ? 'active' : ''}>
-              <NavLink to="/grammar/correction" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Sentence Correction</NavLink>
-            </li>
-            <li className={location.pathname === '/grammar/qa' ? 'active' : ''}>
-              <NavLink to="/grammar/qa" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Grammar Q&A</NavLink>
-            </li>
-          </ul>
+        
+        <li className={location.pathname === '/grammar/correction' ? 'active' : ''}>
+          <NavLink id='sentence-correction' to="/grammar/correction" title=' Check and correct your English sentences' className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Sentence Correction</NavLink>
         </li>
-        <li className={`pronunciation ${location.pathname === '/pronunciation' ? 'active' : ''}`}>
-          <NavLink to="/pronunciation" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Pronounciation Correction</NavLink>
+        <li className={location.pathname === '/grammar/qa' ? 'active' : ''}>
+          <NavLink id='grammar-qa' to="/grammar/qa" title='Ask questions about English grammar rules' className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Grammar Q&A</NavLink>
         </li>
+    
+       
       </ul>
     </nav>
   );

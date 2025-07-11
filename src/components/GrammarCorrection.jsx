@@ -100,6 +100,7 @@ const GrammarCorrection = ({ selectedLanguage }) => {
       alert('error in translation');
     }
   };
+  console.log(result)
   return (
     <div className="grammar-container">
       <h2>Sentence Correction</h2>
