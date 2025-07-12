@@ -1,96 +1,110 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import GrammarCorrection from './components/GrammarCorrection';
+import { BrowserRouter , Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from './components/LoginPage';
+import Navbar from './components/Navbar.jsx';
+import HomePage from './components/Home.jsx';
+import GrammarCorrection from './components/GrammarCorrection.jsx';
+import GrammarQA from './components/GrammarQA.jsx';
+import PersonalCenter from './components/PersonalCentre.jsx';
+import RegisterPage from './components/RegisterPage.jsx';
+import PersonaliseCorrection from './components/PersonaliseCorrection.jsx';
 
-import GrammarQA from './components/GrammarQA';
 import './App.css';
-
-const Home = ({ selectedLanguage, setSelectedLanguage, hasSelectedLanguage, setHasSelectedLanguage }) => {
-  const handleLanguageChange = (e) => {
-    setSelectedLanguage(e.target.value);
-    setHasSelectedLanguage(true);
-  };
-
-  return (
-    <div className="home">
-       <div className='content'>
-      <h1 className='slogan'>Speak Smarter. Write Better.</h1>
-     
-      <div className="mother-language">
-          <span className="arrow-pointing">→</span>
-          Your mother language:&nbsp;
-          <select
-            name="language"
-            id="language"
-            value={selectedLanguage}
-            onChange={handleLanguageChange}
-          >
-            <option value="en">English</option>
-            <option value="zh-Hans">Chinese (Simplified)</option>
-            <option value="sw">Swahili</option>
-            <option value="ha">Hausa</option>
-            <option value="yo">Yoruba</option>
-            <option value="ig">Igbo</option>
-            <option value="fr">French</option>
-            <option value="es">Spanish</option>
-            <option value="pt">Portuguese</option>
-            <option value="ar">Arabic</option>
-            <option value="bn">Bengali</option>
-            <option value="hi">Hindi</option>
-            <option value="ne">Nepali</option>
-            <option value="my">Burmese</option>
-            <option value="km">Khmer</option>
-            <option value="lo">Lao</option>
-            <option value="am">Amharic</option>
-            <option value="om">Oromo</option>
-            <option value="rw">Kinyarwanda</option>
-            <option value="so">Somali</option>
-            <option value="ug">Uyghur</option>
-          </select>
-        </div>
-      {hasSelectedLanguage && (
-        <p className="journey-text">You can correct your grammar and pronunciation here. Please choose the function from the navigation bar and start your journey.</p>
-      )}
-      {/* <div className="feature-list">
-        <div className="feature-item">
-          <h3>Grammar Features</h3>
-          <ul>
-            <li>Sentence Correction - Check and correct your English sentences</li>
-            <li>Grammar Q&A - Ask questions about English grammar rules</li>
-          </ul>
-        </div>
-        <div className="feature-item">
-          <h3>Pronunciation Features</h3>
-          <ul>
-            <li>Pronunciation Correction - Practice and improve your English pronunciation</li>
-          </ul>
-        </div>
-       
-      </div> */}
-      </div>
-
-    </div>
-  );
-};
-
 function App() {
-  const [selectedLanguage, setSelectedLanguage] = useState('en');
-  const [hasSelectedLanguage, setHasSelectedLanguage] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState('');
+  const [userId, setUserId] = useState(null);
+  const [selectedLanguage,setSelectedLanguage]=useState('en')
+  const [hasSelectedLanguage,setHasSelectedLanguage]=useState(false)
+
   return (
-    <BrowserRouter>
-      <div className="app">
-        <Navbar />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<Home selectedLanguage={selectedLanguage} setSelectedLanguage={setSelectedLanguage} hasSelectedLanguage={hasSelectedLanguage} setHasSelectedLanguage={setHasSelectedLanguage} />} />
-            <Route path="/grammar/correction" element={<GrammarCorrection selectedLanguage={selectedLanguage} />} />
-            <Route path="/grammar/qa" element={<GrammarQA selectedLanguage={selectedLanguage} />} />
-            
-          </Routes>
-        </main>
+    // <BrowserRouter>
+    <div className="app-container">
+      {isLoggedIn && (
+       <>
+          <Navbar />
+        
+        </>
+    
+      )}
+      <div className="content-container">
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              <LoginPage
+                setIsLoggedIn={setIsLoggedIn}
+                username={username}
+                setUsername={setUsername}
+                setUserId={setUserId}
+              />
+            }
+          />
+          <Route path="/register" element={<RegisterPage />} />
+
+          {/* 受保护路由 */}
+          <Route
+            path="/"
+            element={
+              isLoggedIn ? (
+                <HomePage setHasSelectedLanguage={setHasSelectedLanguage} setSelectedLanguage={setSelectedLanguage} selectedLanguage={selectedLanguage} hasSelectedLanguage={hasSelectedLanguage} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/grammar/correction"
+            element={
+              isLoggedIn ? (
+                <GrammarCorrection selectedLanguage={selectedLanguage} username={username} userId={userId} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/grammar/qa"
+            element={
+              isLoggedIn ? (
+                <GrammarQA username={username} selectedLanguage={selectedLanguage} userId={userId}/>
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route path='/personalise_correction'
+          element={
+            isLoggedIn ? (
+              <PersonaliseCorrection username={username} selectedLanguage={selectedLanguage} userId={userId}/>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+          
+          />
+          <Route
+            path="/personal"
+            element={
+              isLoggedIn ? (
+                <PersonalCenter 
+                  username={username} 
+                  userId={userId}
+                  setIsLoggedIn={setIsLoggedIn}
+                  setUsername={setUsername}
+                  setUserId={setUserId}
+                  setSelectedLanguage={setSelectedLanguage}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route path="*" element={<Navigate to="/login" />} />
+        </Routes>
       </div>
-    </BrowserRouter>
+    </div>
+  // </BrowserRouter>
   );
 }
 

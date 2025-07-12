@@ -1,28 +1,43 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './GrammarQA.css';
 
-const STORAGE_KEY = 'grammar_qa_chat_history';
+function getStorageKey(userId) {
+  return `grammar_qa_chat_history_${userId}`;
+}
 
-function getInitialMessages() {
+function getInitialMessages(userId) {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const storageKey = getStorageKey(userId);
+    const saved = localStorage.getItem(storageKey);
     if (saved) return JSON.parse(saved);
   } catch {}
   return [];
 }
 
-const GrammarQA = ({ selectedLanguage }) => {
+const GrammarQA = ({ selectedLanguage, userId }) => {
   const [question, setQuestion] = useState('');
-  const [messages, setMessages] = useState(getInitialMessages); // 初始化时从localStorage读取
+  const [messages, setMessages] = useState([]); // 初始化为空数组
   const [isLoading, setIsLoading] = useState(false);
   const [translatingIdx, setTranslatingIdx] = useState(null); // 当前正在翻译的消息索引
   const chatEndRef = useRef(null);
-  const prevMsgLenRef = useRef(messages.length);
+  const prevMsgLenRef = useRef(0);
 
-  // 聊天记录变动时保存
+  // 当userId改变时，加载对应用户的聊天记录
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-  }, [messages]);
+    if (userId) {
+      const userMessages = getInitialMessages(userId);
+      setMessages(userMessages);
+      prevMsgLenRef.current = userMessages.length;
+    }
+  }, [userId]);
+
+  // 聊天记录变动时保存到对应用户的存储
+  useEffect(() => {
+    if (userId && messages.length > 0) {
+      const storageKey = getStorageKey(userId);
+      localStorage.setItem(storageKey, JSON.stringify(messages));
+    }
+  }, [messages, userId]);
 
   // 只有新消息加入时才滚动到底部
   useEffect(() => {
@@ -36,11 +51,13 @@ const GrammarQA = ({ selectedLanguage }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!question.trim()) return;
+    if (!question.trim() || !userId) return;
+    
     const userMsg = { role: 'user', content: question };
     setMessages((prev) => [...prev, userMsg]);
     setIsLoading(true);
     setQuestion('');
+    
     try {
       const response = await fetch('http://localhost:5000/api/grammar/qa', {
         method: 'POST',
@@ -49,6 +66,7 @@ const GrammarQA = ({ selectedLanguage }) => {
       });
       const data = await response.json();
       let answerMsg = { role: 'assistant', content: data.answer };
+      
       // 如果需要翻译
       if (selectedLanguage && selectedLanguage !== 'en') {
         const transResp = await fetch('http://localhost:5000/api/translate', {
@@ -87,32 +105,61 @@ const GrammarQA = ({ selectedLanguage }) => {
     setTranslatingIdx(null);
   };
 
+  // 清除当前用户的聊天记录
+  const clearChatHistory = () => {
+    if (userId) {
+      const storageKey = getStorageKey(userId);
+      localStorage.removeItem(storageKey);
+      setMessages([]);
+      prevMsgLenRef.current = 0;
+    }
+  };
+
   return (
     <div className="chatgpt-qa-container">
-      <div className="chatgpt-qa-header">Grammar Q&A</div>
+      <div className="chatgpt-qa-header">
+        <span>Grammar Q&A</span>
+        {userId && messages.length > 0 && (
+          <button 
+            className="clear-chat-btn" 
+            onClick={clearChatHistory}
+            title="Clear chat history"
+          >
+            🗑️ Clear
+          </button>
+        )}
+        
+      </div>
       <div className="chatgpt-qa-messages">
-        {messages.map((msg, idx) => (
-          <div key={idx} className={`chatgpt-qa-message ${msg.role}`}> 
-            <div className="chatgpt-qa-avatar">{msg.role === 'user' ? '🧑' : '🤖'}</div>
-            <div className="chatgpt-qa-bubble">
-              {msg.content}
-              {msg.translated && (
-                <div className="qa-translation">{msg.translated}</div>
+        {messages.length === 0 ? (
+          <div className="empty-chat">
+            <p>Welcome to Grammar Q&A!</p>
+            <p>Ask any grammar questions and get instant answers.</p>
+          </div>
+        ) : (
+          messages.map((msg, idx) => (
+            <div key={idx} className={`chatgpt-qa-message ${msg.role}`}> 
+              <div className="chatgpt-qa-avatar">{msg.role === 'user' ? '🧑' : '🤖'}</div>
+              <div className="chatgpt-qa-bubble">
+                {msg.content}
+                {msg.translated && (
+                  <div className="qa-translation">{msg.translated}</div>
+                )}
+              </div>
+              {/* 仅AI回答显示翻译按钮，且未翻译时 */}
+              {msg.role === 'assistant' && !msg.translated && (
+                <button
+                  className="qa-translate-btn"
+                  onClick={() => handleTranslate(idx)}
+                  disabled={translatingIdx === idx}
+                  style={{ marginLeft: 8 }}
+                >
+                  {translatingIdx === idx ? '翻译中...' : '翻译'}
+                </button>
               )}
             </div>
-            {/* 仅AI回答显示翻译按钮，且未翻译时 */}
-            {msg.role === 'assistant' && !msg.translated  && (
-              <button
-                className="qa-translate-btn"
-                onClick={() => handleTranslate(idx)}
-                disabled={translatingIdx === idx}
-                style={{ marginLeft: 8 }}
-              >
-                {translatingIdx === idx ? '翻译中...' : '翻译'}
-              </button>
-            )}
-          </div>
-        ))}
+          ))
+        )}
         <div ref={chatEndRef} />
       </div>
       <form className="chatgpt-qa-inputbar" onSubmit={handleSubmit}>
@@ -121,9 +168,9 @@ const GrammarQA = ({ selectedLanguage }) => {
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="Please enter your questions here..."
           rows={1}
-          disabled={isLoading}
+          disabled={isLoading || !userId}
         />
-        <button type="submit" disabled={isLoading || !question.trim()}>
+        <button type="submit" disabled={isLoading || !question.trim() || !userId}>
           {isLoading ? 'Sending...' : 'Send'}
         </button>
       </form>

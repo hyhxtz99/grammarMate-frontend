@@ -1,17 +1,11 @@
-import React, { useState } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import { NavLink, } from 'react-router-dom';
 import './Navbar.css';
 
 function Navbar() {
   const location = useLocation();
-  const navigate = useNavigate();
 
-  const handleGrammarClick = () => {
-    // 如果当前不在grammar相关页面，则跳转到sentence correction
-    if (!location.pathname.startsWith('/grammar')) {
-      navigate('/grammar/correction');
-    }
-  };
 
   return (
     <nav className="navbar">
@@ -26,6 +20,12 @@ function Navbar() {
         </li>
         <li className={location.pathname === '/grammar/qa' ? 'active' : ''}>
           <NavLink id='grammar-qa' to="/grammar/qa" title='Ask questions about English grammar rules' className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Grammar Q&A</NavLink>
+        </li>
+        <li className={location.pathname === '/personalise_correction' ? 'active' : ''}>
+          <NavLink id='personalise-correction' to="/personalise_correction" title='Personalise grammar error correction' className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Personalised correction</NavLink>
+        </li>
+        <li className={location.pathname === '/personal' ? 'active' : ''}>
+        <NavLink id='personal-centre' to="/personal" title='Develop a personal grammar correction plan' className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Personal Centre</NavLink>
         </li>
     
        

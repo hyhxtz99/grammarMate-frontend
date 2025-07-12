@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import './GrammarCorrection.css';
 
-const GrammarCorrection = ({ selectedLanguage }) => {
+const GrammarCorrection = ({ selectedLanguage, userId }) => {
   const [text, setText] = useState('');
   const [result, setResult] = useState(null);
   const [isLoading, setLoading]=useState(false);
@@ -31,12 +31,23 @@ const GrammarCorrection = ({ selectedLanguage }) => {
   const stopRecording = async () => {
     try {
       const response = await fetch('http://localhost:5000/api/speech/stop', {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ user_id: userId })
       });
       const data = await response.json();
       if (data.text) {
         setText(data.text);
-        setResult(data.grammar_result);
+        if(JSON.stringify(data['errors']) === JSON.stringify(['none'])){
+          setResult(data.explanations);
+        } else {
+          // 当有错误时，组合explanations和corrected_sentence
+          const explanations = Array.isArray(data.explanations) ? data.explanations.join(' ') : data.explanations;
+          const correctedSentence = data.corrected_sentence || '';
+          setResult(`${explanations} \n\nThe correct sentence is: ${correctedSentence}`.trim());
+        }
       }
       setIsRecording(false);
       
@@ -60,10 +71,17 @@ const GrammarCorrection = ({ selectedLanguage }) => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({ text, user_id: userId })
       });
       const data = await response.json();
-      setResult(data.grammar_result);
+      if(JSON.stringify(data['errors']) === JSON.stringify(['none'])){
+        setResult(data.explanations);
+      } else {
+        // 当有错误时，组合explanations和corrected_sentence
+        const explanations = Array.isArray(data.explanations) ? data.explanations.join(' ') : data.explanations;
+        const correctedSentence = data.corrected_sentence || '';
+        setResult(`${explanations} \n\nThe correct sentence is: ${correctedSentence}`.trim());
+      }
     } catch (error) {
       console.error('Error:', error);
       alert('error in processing text');
