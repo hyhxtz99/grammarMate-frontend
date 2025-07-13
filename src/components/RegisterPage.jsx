@@ -1,11 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './RegisterPage.css';
 
 function RegisterPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
+
+  // 设置页面背景
+  useEffect(() => {
+    document.body.classList.add('register-background');
+    return () => {
+      document.body.classList.remove('register-background');
+    };
+  }, []);
 
   const handleRegister = async () => {
     try {
@@ -29,50 +38,35 @@ function RegisterPage() {
   };
 
   return (
-    <div style={styles.container}>
-      <h2>Register</h2>
-      <input 
-        value={username} 
-        onChange={e => setUsername(e.target.value)} 
-        placeholder="Username *" 
-        style={styles.input}
-      />
-      <input 
-        type="password" 
-        value={password} 
-        onChange={e => setPassword(e.target.value)} 
-        placeholder="Password *" 
-        style={styles.input}
-      />
-      <input 
-        type="email" 
-        value={email} 
-        onChange={e => setEmail(e.target.value)} 
-        placeholder="Email (optional)" 
-        style={styles.input}
-      />
-      <button onClick={handleRegister} style={styles.button}>Register</button>
-      <button onClick={() => navigate('/login')} style={styles.button}>Back to Login</button>
+    <div className="register-wrapper">
+      <div className='register-page'></div>
+      <div className='register-container'>
+        <h2>Register</h2>
+        <input 
+          value={username} 
+          onChange={e => setUsername(e.target.value)} 
+          placeholder="Username *" 
+          className="username"
+        />
+        <input 
+          type="password" 
+          value={password} 
+          onChange={e => setPassword(e.target.value)} 
+          placeholder="Password *" 
+          className="password"
+        />
+        <input 
+          type="email" 
+          value={email} 
+          onChange={e => setEmail(e.target.value)} 
+          placeholder="Email (optional)" 
+          className="email"
+        />
+        <button onClick={handleRegister}>Register</button>
+        <button onClick={() => navigate('/login')}>Back to Login</button>
+      </div>
     </div>
   );
 }
-
-const styles = {
-  container: { 
-    display: 'flex', 
-    flexDirection: 'column', 
-    alignItems: 'center', 
-    marginTop: '100px' 
-  },
-  input: { 
-    margin: '10px', 
-    padding: '8px', 
-    width: '200px' 
-  },
-  button: { 
-    padding: '8px 20px',
-    margin: '5px'
-  }
-};
 
 export default RegisterPage;

@@ -7,6 +7,7 @@ const GrammarCorrection = ({ selectedLanguage, userId }) => {
   const [isLoading, setLoading]=useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [translatedResult, setTranslatedResult] = useState(null);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   
 
@@ -88,7 +89,14 @@ const GrammarCorrection = ({ selectedLanguage, userId }) => {
     }
     setLoading(false);
   };
+  
+  const handleMouseEnterResult = () => {
+    setShowTooltip(true);
+  };
 
+  const handleMouseLeaveResult = () => {
+    setShowTooltip(false);
+  };
 
   const handleTranslate = async () => {
     if (!result) {
@@ -154,11 +162,20 @@ const GrammarCorrection = ({ selectedLanguage, userId }) => {
       {result && (
         <div className="result-section">
           <h3>Checked results: </h3>
-          <div className="result-content">
-            {Array.isArray(result) ? result[0] : result}
-           
+          <div 
+            className="result-content-wrapper"
+            onMouseEnter={handleMouseEnterResult}
+            onMouseLeave={handleMouseLeaveResult}
+          >
+            <div className="result-content">
+              {Array.isArray(result) ? result[0] : result}
+            </div>
+            {showTooltip && (
+              <div className="result-tooltip">
+                If you want a more detailed explanation about a grammar point, you can ask in the Q&A channel.
+              </div>
+            )}
           </div>
-          <h3> (If you want a more detailed explanation about a grammar point, you can ask in the Q&A channel.)</h3>
           <button onClick={handleTranslate} className="translate">Translate to {selectedLanguage}</button>
           {translatedResult &&
             <p>{translatedResult}</p>

@@ -20,13 +20,13 @@ const PersonaliseCorrection = ({ username, selectedLanguage, userId }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   
-  // 新增状态用于练习题展示
+  // New state for exercise display
   const [exercises, setExercises] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [isPracticing, setIsPracticing] = useState(false);
 
-  // 获取用户统计数据
+  // Get user statistics
   useEffect(() => {
     if (userId) {
       fetchUserStats();
@@ -56,7 +56,7 @@ const PersonaliseCorrection = ({ username, selectedLanguage, userId }) => {
     history.forEach(record => {
       const recordDate = new Date(record.created_at);
       
-      // 统计今日和本周数据
+      // Count today and this week data
       if (recordDate.toDateString() === today.toDateString()) {
         todayCount++;
       }
@@ -64,7 +64,7 @@ const PersonaliseCorrection = ({ username, selectedLanguage, userId }) => {
         weekCount++;
       }
 
-      // 统计错误类型
+      // Count error types
       if (record.error_types && Array.isArray(record.error_types)) {
         record.error_types.forEach(errorType => {
           if (errorCounts.hasOwnProperty(errorType)) {
@@ -104,45 +104,45 @@ const PersonaliseCorrection = ({ username, selectedLanguage, userId }) => {
         setCurrentQuestionIndex(0);
         setShowAnswer(false);
         setIsPracticing(true);
-        setMessage(`成功获取 ${count} 道个性化练习题！`);
+        setMessage(`Successfully retrieved ${count} personalized practice questions!`);
         console.log(data.exercises)
       } else {
-        setMessage(data.error || '获取练习题失败');
+        setMessage(data.error || 'Failed to get practice questions');
       }
     } catch (error) {
-      setMessage('获取练习题时出错');
+      setMessage('Error occurred while getting practice questions');
     } finally {
       setLoading(false);
     }
   };
 
-  // 处理用户选择
+  // Handle user choice
   const handleUserChoice = (isCorrect) => {
     if (isCorrect) {
-      // 选择对钩，直接跳到下一题
+      // Choose checkmark, go to next question directly
       nextQuestion();
     } else {
-      // 选择X，显示答案和解释
+      // Choose X, show answer and explanation
       setShowAnswer(true);
     }
   };
 
-  // 下一题
+  // Next question
   const nextQuestion = () => {
     if (currentQuestionIndex < exercises.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setShowAnswer(false);
     } else {
-      // 练习完成
+      // Practice completed
       setIsPracticing(false);
       setExercises([]);
       setCurrentQuestionIndex(0);
       setShowAnswer(false);
-      setMessage('练习完成！');
+      setMessage('Practice completed!');
     }
   };
 
-  // 计算错误类型统计的百分比
+  // Calculate error type statistics percentages
   const getErrorPercentages = () => {
     const total = Object.values(errorStats).reduce((sum, count) => sum + count, 0);
     if (total === 0) return {};
@@ -156,7 +156,7 @@ const PersonaliseCorrection = ({ username, selectedLanguage, userId }) => {
 
   const errorPercentages = getErrorPercentages();
 
-  // 渲染当前问题
+  // Render current question
   const renderCurrentQuestion = () => {
     if (!exercises.length || currentQuestionIndex >= exercises.length) {
       return null;
@@ -167,7 +167,7 @@ const PersonaliseCorrection = ({ username, selectedLanguage, userId }) => {
     return (
       <div className="question-container">
         <div className="question-header">
-          <h3>问题 {currentQuestionIndex + 1} / {exercises.length}</h3>
+          <h3>Question {currentQuestionIndex + 1} / {exercises.length}</h3>
         </div>
         
         <div className="question-content">
@@ -180,30 +180,30 @@ const PersonaliseCorrection = ({ username, selectedLanguage, userId }) => {
             onClick={() => handleUserChoice(true)}
             disabled={showAnswer}
           >
-            ✅ 我知道答案
+            ✅ I know the answer
           </button>
           <button 
             className="choice-btn incorrect-btn"
             onClick={() => handleUserChoice(false)}
             disabled={showAnswer}
           >
-            ❌ 我需要帮助
+            ❌ I need help
           </button>
         </div>
 
         {showAnswer && (
           <div className="answer-section">
             <div className="answer-content">
-              <h4>正确答案：</h4>
+              <h4>Correct Answer:</h4>
               <p className="correct-answer">{currentExercise.answer}</p>
-              <h4>解释：</h4>
+              <h4>Explanation:</h4>
               <p className="explanation">{currentExercise.explanation}</p>
             </div>
             <button 
               className="next-btn"
               onClick={nextQuestion}
             >
-              下一个
+              Next
             </button>
           </div>
         )}
@@ -216,7 +216,7 @@ const PersonaliseCorrection = ({ username, selectedLanguage, userId }) => {
       <h2>Personalized Grammar Correction</h2>
       
       {message && (
-        <div className={`message ${message.includes('成功') ? 'success' : 'error'}`}>
+        <div className={`message ${message.includes('Successfully') ? 'success' : 'error'}`}>
           {message}
         </div>
       )}
@@ -227,9 +227,9 @@ const PersonaliseCorrection = ({ username, selectedLanguage, userId }) => {
         </div>
       ) : (
         <div className="stats-grid">
-          {/* 错误类型统计饼图 */}
+          {/* Error type statistics pie chart */}
           <div className="stats-card error-pie-chart">
-            <h3>📊 错误类型统计</h3>
+            <h3>📊 Error Type Statistics</h3>
             <div className="pie-chart-container">
               {Object.keys(errorStats).map(errorType => {
                 const percentage = errorPercentages[errorType] || 0;
@@ -252,54 +252,54 @@ const PersonaliseCorrection = ({ username, selectedLanguage, userId }) => {
                 );
               })}
               {Object.values(errorStats).every(count => count === 0) && (
-                <div className="no-data">暂无错误数据</div>
+                <div className="no-data">No error data available</div>
               )}
             </div>
           </div>
 
-          {/* 我的纠错数据 */}
+          {/* My correction data */}
           <div className="stats-card user-stats">
-            <h3>📈 我的纠错数据</h3>
+            <h3>📈 My Correction Data</h3>
             <div className="stats-list">
               <div className="stat-item">
                 <span className="stat-icon">✅</span>
-                <span className="stat-label">今日提问：</span>
+                <span className="stat-label">Today's questions:</span>
                 <span className="stat-value">{userStats.today}</span>
               </div>
               <div className="stat-item">
                 <span className="stat-icon">✅</span>
-                <span className="stat-label">本周提问：</span>
+                <span className="stat-label">This week's questions:</span>
                 <span className="stat-value">{userStats.thisWeek}</span>
               </div>
               <div className="stat-item">
                 <span className="stat-icon">📝</span>
-                <span className="stat-label">总提问数：</span>
+                <span className="stat-label">Total questions:</span>
                 <span className="stat-value">{userStats.total}</span>
               </div>
             </div>
           </div>
 
-          {/* 个性化推荐练习 */}
+          {/* Personalized practice recommendations */}
           <div className="stats-card personalized-practice">
-            <h3>🎯 个性化推荐练习</h3>
+            <h3>Targeted Practice Based on Your Errors</h3>
             <div className="practice-buttons">
               <button 
                 className="practice-btn"
                 onClick={() => getPersonalizedExercises(5)}
                 disabled={loading}
               >
-                {loading ? '获取中...' : '获取5题'}
+                {loading ? 'Fetching...' : 'Start 5-Question Practice'}
               </button>
               <button 
                 className="practice-btn"
                 onClick={() => getPersonalizedExercises(10)}
                 disabled={loading}
               >
-                {loading ? '获取中...' : '获取10题'}
+                {loading ? 'Fetching...' : 'Start 10-Question Practice'}
               </button>
             </div>
             <div className="practice-info">
-              <p>基于您的错误类型统计，为您推荐针对性练习</p>
+              <p>Practice recommendations based on your grammar error statistics.</p>
             </div>
           </div>
         </div>

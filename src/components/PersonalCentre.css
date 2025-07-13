@@ -56,20 +56,29 @@
 
 .profile-field label,
 .password-field label {
-  width: 150px;
+
   font-weight: bold;
   color: #555;
 }
-
+.profile-field label{
+  width: 100px;
+}
 .field-content {
   flex: 1;
   display: flex;
   align-items: center;
   gap: 10px;
 }
+.field-content input{
+  flex: 0.5; /* 让input变窄 */
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
 
 .field-content span {
-  flex: 1;
+  flex: 0.5; /* 让span变窄 */
   padding: 8px 0;
   color: #666;
 }
@@ -77,17 +86,22 @@
 .profile-field input,
 .profile-field select,
 .password-field input {
-  flex: 1;
   padding: 8px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 16px;
 }
-
+.password-field label{
+  width: 200px;
+}
+.password-field input{
+  width: 100%;
+}
 .profile-field input:focus,
 .profile-field select:focus,
 .password-field input:focus {
   outline: none;
+
   border-color: #007bff;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
@@ -95,21 +109,24 @@
 .field-actions {
   display: flex;
   gap: 5px;
+  flex: 1; /* 让按钮区域占用剩余空间 */
 }
 
 .edit-field-btn {
-  padding: 4px 8px;
+  padding: 6px 12px;
   border: 1px solid #007bff;
-  background-color: transparent;
-  color: #007bff;
+  background-color: #007bff;
+  color: white;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   transition: all 0.3s ease;
+  flex: 1; /* 让按钮占满可用空间 */
+  min-width: 80px; /* 确保按钮有最小宽度 */
 }
 
 .edit-field-btn:hover {
-  background-color: #007bff;
+  background-color: #322bb0;
   color: white;
 }
 
@@ -118,10 +135,12 @@
 .change-password-btn,
 .logout-btn {
   padding: 10px 20px;
+  height: 40px;
+
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: bold;
   transition: all 0.3s ease;
 }
@@ -129,16 +148,19 @@
 .save-btn.small,
 .cancel-btn.small {
   padding: 4px 8px;
-  font-size: 12px;
+  font-size: 16px;
+  height: 40px;
+  flex: 1; /* 确保small按钮也能充满宽度 */
+  max-width: 200px; /* 保持最大宽度限制 */
 }
-
 .save-btn {
-  background-color: #28a745;
+  background-color: #007bff;
   color: white;
+ 
 }
 
 .save-btn:hover {
-  background-color: #1e7e34;
+  background-color: #322bb0;
 }
 
 .save-btn:disabled {
@@ -149,6 +171,9 @@
 .cancel-btn {
   background-color: #6c757d;
   color: white;
+  flex: 1; /* 让按钮充满可用宽度 */
+  max-width: 200px;
+  
 }
 
 .cancel-btn:hover {
@@ -156,12 +181,14 @@
 }
 
 .change-password-btn {
-  background-color: #28a745;
+  background-color: #007bff;
   color: white;
+  flex: 1; /* 让按钮充满可用宽度 */
+  max-width: 200px; /* 限制最大宽度 */
 }
 
 .change-password-btn:hover {
-  background-color: #1e7e34;
+  background-color: #322bb0;
 }
 
 .logout-section {
@@ -191,6 +218,8 @@
   margin-top: 20px;
   display: flex;
   gap: 10px;
+  justify-content: center; /* 居中显示 */
+  align-items: center;
 }
 
 /* Responsive design */
@@ -223,11 +252,30 @@
   
   .password-actions {
     flex-direction: column;
+    gap: 15px; /* 在移动端增加按钮间距 */
   }
   
   .save-btn,
   .cancel-btn,
-  .change-password-btn {
+  .change-password-btn,
+  .save-btn.small,
+  .cancel-btn.small {
     width: 100%;
+    max-width: none; /* 在移动端取消最大宽度限制 */
+    flex: none; /* 在移动端取消flex，使用固定宽度 */
+  }
+}
+
+/* 大屏幕优化 */
+@media (min-width: 1200px) {
+  .password-actions {
+    max-width: 600px; /* 在大屏幕上限制最大宽度 */
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .change-password-btn,
+  .cancel-btn {
+    max-width: 250px; /* 在大屏幕上增加最大宽度 */
   }
 } 

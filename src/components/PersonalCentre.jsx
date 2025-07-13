@@ -178,23 +178,18 @@ function PersonalCenter({ username,setSelectedLanguage, userId, setIsLoggedIn, s
   return (
     <div className="personal-center">
       <h2>Personal Center</h2>
-      
       {message && (
         <div className={`message ${message.includes('successfully') ? 'success' : 'error'}`}>
           {message}
         </div>
       )}
-
       <div className="profile-section">
         <h3>Profile Information</h3>
-        
         {renderField('username', 'Username')}
         {renderField('email', 'Email', 'email')}
       </div>
-
       <div className="password-section">
         <h3>Change Password</h3>
-        
         {isChangingPassword ? (
           <div className="password-form">
             <div className="password-field">
@@ -217,14 +212,14 @@ function PersonalCenter({ username,setSelectedLanguage, userId, setIsLoggedIn, s
             
             <div className="password-actions">
               <button 
-                className="save-btn" 
+                className="save-btn small" 
                 onClick={handlePasswordChange}
                 disabled={loading}
               >
                 {loading ? 'Changing...' : 'Change Password'}
               </button>
               <button 
-                className="cancel-btn" 
+                className="cancel-btn small" 
                 onClick={() => {
                   setIsChangingPassword(false);
                   setPasswordData({ new_password: '', confirm_password: '' });

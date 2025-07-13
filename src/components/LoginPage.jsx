@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './LoginPage.css';
 
 function LoginPage({ setIsLoggedIn,username,setUsername,setUserId }) {
     
     const [password, setPassword] = useState('');
-  const navigate = useNavigate();
+    const navigate = useNavigate();
+
+    // 设置页面背景
+    useEffect(() => {
+        document.body.classList.add('login-background');
+        return () => {
+            document.body.classList.remove('login-background');
+        };
+    }, []);
 
   const handleLogin = async () => {
     try {
@@ -33,33 +42,33 @@ function LoginPage({ setIsLoggedIn,username,setUsername,setUserId }) {
   };
 
   return (
-    <div style={styles.container}>
-      <h2>Login</h2>
-      <input
-        style={styles.input}
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={e => setUsername(e.target.value)}
-      />
-      <input
-        style={styles.input}
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-      />
-      <button style={styles.button} onClick={handleLogin}>Login</button>
-      <button style={styles.button} onClick={() => navigate('/register')}>Register</button>
+    <div className="login-wrapper">
+      <div className='login-page'></div>
+      <div className='container' >
+        <h2>Welcome to GrammarMate!</h2>
+        
+        <input
+          className='username'
+         
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+        />
+        <input className='password'
+       
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+        />
+        <button  onClick={handleLogin}>Login</button>
+        <button  onClick={() => navigate('/register')}>Register</button>
 
+      </div>
     </div>
   );
 }
 
-const styles = {
-  container: { display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '100px' },
-  input: { margin: '10px', padding: '8px', width: '200px' },
-  button: { padding: '8px 20px' }
-};
 
 export default LoginPage;
