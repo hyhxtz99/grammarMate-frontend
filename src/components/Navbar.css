@@ -4,7 +4,7 @@
   box-sizing: border-box;
 }
 .navbar {
-  background-color: #3498db;
+  background-color: #4A90E2;
  
   min-width: 20vw;
   /* max-width :15vw; */
@@ -16,7 +16,70 @@
   align-items: center;
 
   border-radius: 0 15px 15px 0;
+  transition: min-width 0.3s, width 0.3s, padding 0.3s;
+  position: relative;
+}
 
+/* 收缩状态 */
+.navbar.collapsed {
+  min-width: 60px;
+  width: 60px;
+  padding-left: 0;
+  padding-right: 0;
+  align-items: flex-start;
+  border-radius: 0 15px 15px 0;
+}
+
+/* 收缩时只显示图标，隐藏文字 */
+.navbar.collapsed .nav-links li a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.7rem;
+  padding: 0;
+}
+.navbar.collapsed .nav-links li a {
+  width: 100%;
+}
+.navbar.collapsed .nav-links li a:not(:hover) {
+  color: inherit;
+}
+.navbar.collapsed .nav-links li {
+  padding: 12px 0;
+}
+.navbar.collapsed .nav-links li.active {
+  background: #fff;
+  color: #4A90E2;
+}
+
+/* 收缩时隐藏所有非图标内容（可选） */
+.navbar.collapsed .nav-links li a span {
+  display: none;
+}
+
+/* 切换按钮样式 */
+.navbar-toggle-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #fff;
+  color: #4A90E2;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.2s, color 0.2s;
+}
+.navbar-toggle-btn:hover {
+  background: #e3f2fd;
+  color: #2176d2;
 }
 
 
@@ -45,12 +108,12 @@
 }
 
 .nav-links li.active{
-  color: #3498db;
+  color: #4A90E2;
   background-color: white;
 }
 
 .nav-links li:hover a{
-  color: #3498db;
+  color: #4A90E2;
 
 }
 .nav-links li:hover{

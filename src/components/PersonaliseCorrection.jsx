@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './PersonaliseCorrection.css';
+import { useNavigate } from 'react-router-dom';
 
 const PersonaliseCorrection = ({ username, selectedLanguage, userId }) => {
+  const navigate = useNavigate();
   const [errorStats, setErrorStats] = useState({
     'subject-verb agreement': 0,
     'tense': 0,
@@ -19,6 +21,8 @@ const PersonaliseCorrection = ({ username, selectedLanguage, userId }) => {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [historyDetails, setHistoryDetails] = useState([]); // 保存历史问题详情
+  const [showHistory, setShowHistory] = useState(false); // 控制详情展开
   
   // New state for exercise display
   const [exercises, setExercises] = useState([]);
@@ -39,6 +43,7 @@ const PersonaliseCorrection = ({ username, selectedLanguage, userId }) => {
       if (response.ok) {
         const data = await response.json();
         processUserData(data.history);
+        setHistoryDetails(data.history || []);
       }
     } catch (error) {
       console.error('Error fetching user stats:', error);
@@ -229,15 +234,28 @@ const PersonaliseCorrection = ({ username, selectedLanguage, userId }) => {
         <div className="stats-grid">
           {/* Error type statistics pie chart */}
           <div className="stats-card error-pie-chart">
-            <h3>📊 Error Type Statistics</h3>
+            <h3
+              style={{cursor: historyDetails.length ? 'pointer' : 'default'}}
+              onClick={() => {
+                const allErrorTypeDetails = historyDetails.filter(item => Array.isArray(item.error_types) && item.error_types.length > 0 && !item.error_types.includes('none'));
+                if (allErrorTypeDetails.length) {
+                  navigate('/error-type-details', { state: { errorType: 'All', errorDetails: allErrorTypeDetails } });
+                }
+              }}
+            >
+              📊 Error Type Statistics
+            </h3>
             <div className="pie-chart-container">
               {Object.keys(errorStats).map(errorType => {
                 const percentage = errorPercentages[errorType] || 0;
                 const count = errorStats[errorType];
                 if (count === 0) return null;
-                
+                // 新增：筛选该类型的历史详情
+                const errorTypeDetails = historyDetails.filter(item => Array.isArray(item.error_types) && item.error_types.includes(errorType));
                 return (
-                  <div key={errorType} className="error-type-item">
+                  <div key={errorType} className="error-type-item" style={{cursor: errorTypeDetails.length ? 'pointer' : 'default'}}
+                    onClick={() => errorTypeDetails.length && navigate('/error-type-details', { state: { errorType, errorDetails: errorTypeDetails } })}
+                  >
                     <div className="error-type-bar">
                       <div 
                         className="error-type-fill" 
@@ -258,7 +276,10 @@ const PersonaliseCorrection = ({ username, selectedLanguage, userId }) => {
           </div>
 
           {/* My correction data */}
-          <div className="stats-card user-stats">
+          <div className="stats-card user-stats"
+            onClick={() => historyDetails.length && navigate('/history-details', { state: { historyDetails } })}
+            style={{ cursor: historyDetails.length ? 'pointer' : 'default' }}
+          >
             <h3>📈 My Correction Data</h3>
             <div className="stats-list">
               <div className="stat-item">

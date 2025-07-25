@@ -128,6 +128,7 @@ const GrammarCorrection = ({ selectedLanguage, userId }) => {
   };
   console.log(result)
   return (
+    <div className="setence-correction-wrapper">
     <div className="grammar-container">
       <h2>Sentence Correction</h2>
      
@@ -183,6 +184,9 @@ const GrammarCorrection = ({ selectedLanguage, userId }) => {
         </div>
       )}
     </div>
+    </div>
+    
+
   );
 };
 

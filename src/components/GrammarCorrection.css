@@ -1,12 +1,28 @@
 /* 语法纠正组件样式 */
+.setence-correction-wrapper{
+  width: 100%;
+  /* margin: 10px; */
+  height: 100vh;         /* 占满视口高度 */
+  overflow-y: auto;      /* 超出时出现滚动条 */
+  background: #f8f9fa;   /* 可选，和QA风格统一 */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 .grammar-container {
-  min-width: 70%;
-  max-width: 80%;
+ 
+  width: 100%;
   margin: 0 auto;
   padding: 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  
+
+  box-sizing: border-box;
+ 
 }
 
 .grammar-container textarea {
@@ -19,7 +35,7 @@
 }
 
 .grammar-container button {
-  background-color: #3498db;
+  background-color: #4A90E2;
   color: white;
   padding: 0.8rem 1.5rem;
   border: none;
@@ -32,15 +48,23 @@
   background-color: #2980b9;
 }
 
-.submit{
+.text-input .submit{
   margin: 0 auto;
   width: 200px;
   display: block;
+  background-color: #4A90E2;
 }
+
+.text-input .submit:hover{
+  
+  background-color: #2980b9;
+}
+
 .grammar-container h2 {
   text-align: center;
   color: #333;
   margin-bottom: 30px;
+  font-size: 2rem;
 }
 .prompt{
   text-align: center;
@@ -49,7 +73,7 @@
   font-weight: bold;
 }
 .speech-input {
-  margin: 20px 0 0 20px;
+  margin: 0 0 0 20px;
   text-align: center;
 }
 
@@ -119,7 +143,7 @@
 }
 
 .text-input {
-  margin-bottom: 20px;
+  margin: 30px;
 }
 
 
@@ -130,14 +154,16 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 25px;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   margin-bottom: 10px;
   resize: vertical;
+  margin-bottom: 30px;
 }
 
 .text-input button {
   padding: 12px 24px;
   font-size: 16px;
-  background-color: #2196F3;
+  background-color: #4A90E2;
   color: white;
   border: none;
   border-radius: 4px;
@@ -150,9 +176,9 @@
 }
 
 .result-section {
-  margin-top: 20px;
- 
-  background-color: white;
+  /* margin-top: 20px; */
+  padding:20px;
+  background-color: transparent;
   border-radius: 8px;
   animation: slideInFade 0.6s ease-out;
   transform-origin: top center;
@@ -189,6 +215,8 @@
 .result-content-wrapper {
   position: relative;
   width: 100%;
+  /* padding: auto; */
+  margin: 0 auto;
   /* font-size: 16px; */
   text-align: center;
   display: inline-block;
@@ -300,6 +328,7 @@
 
 button.translate {
   padding: 10px 20px;
+  height: 52px;
   display: block;
   border: none;
   margin-bottom: 20px;
@@ -320,10 +349,11 @@ button.translate:hover {
 }
 
 .result-section p {
-  margin-top: 15px;
+  display: block;
+  margin-top: 35px;
   padding: 12px;
   background-color: #e9f7ef;
-  border-left: 4px solid #28a745;
+  border-left: 4px solid #7ED6C1;
   border-radius: 4px;
   font-size: 15px;
   color: #333;

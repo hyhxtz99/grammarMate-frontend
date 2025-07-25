@@ -8,6 +8,8 @@ import GrammarQA from './components/GrammarQA.jsx';
 import PersonalCenter from './components/PersonalCentre.jsx';
 import RegisterPage from './components/RegisterPage.jsx';
 import PersonaliseCorrection from './components/PersonaliseCorrection.jsx';
+import HistoryDetails from './components/HistoryDetails.jsx';
+import ErrorTypeDetails from './components/ErrorTypeDetails.jsx';
 
 import './App.css';
 function App() {
@@ -95,6 +97,26 @@ function App() {
                   setUserId={setUserId}
                   setSelectedLanguage={setSelectedLanguage}
                 />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/history-details"
+            element={
+              isLoggedIn ? (
+                <HistoryDetails />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/error-type-details"
+            element={
+              isLoggedIn ? (
+                <ErrorTypeDetails />
               ) : (
                 <Navigate to="/login" />
               )

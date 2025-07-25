@@ -50,7 +50,7 @@ const GrammarQA = ({ selectedLanguage, userId }) => {
   }, [messages]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!question.trim() || !userId) return;
     
     const userMsg = { role: 'user', content: question };
@@ -115,26 +115,80 @@ const GrammarQA = ({ selectedLanguage, userId }) => {
     }
   };
 
+  // 导出问答记录为 txt 文件
+  const handleExport = () => {
+    if (!messages.length) return;
+    let content = '';
+    messages.forEach((msg, idx) => {
+      const role = msg.role === 'user' ? 'User' : 'AI';
+      content += `${role}: ${msg.content}\n`;
+      if (msg.translated) {
+        content += `Translation: ${msg.translated}\n`;
+      }
+      content += '\n';
+    });
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'grammar_qa_history.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="chatgpt-qa-container">
       <div className="chatgpt-qa-header">
         <span>Grammar Q&A</span>
         {userId && messages.length > 0 && (
-          <button 
-            className="clear-chat-btn" 
-            onClick={clearChatHistory}
-            title="Clear chat history"
-          >
-            🗑️ Clear
-          </button>
+          <div className="header-actions">
+            <button 
+              className="clear-chat-btn" 
+              onClick={clearChatHistory}
+              title="Clear chat history"
+            >
+              🗑️ Clear
+            </button>
+            <button
+              className="export-chat-btn"
+              onClick={handleExport}
+              title="Export chat history"
+            >
+              ⬇️ Export
+            </button>
+          </div>
         )}
-        
       </div>
       <div className="chatgpt-qa-messages">
         {messages.length === 0 ? (
           <div className="empty-chat">
             <p>Welcome to Grammar Q&A!</p>
             <p>Ask any grammar questions and get instant answers.</p>
+            <div className="example-questions">
+              <div className="example-title">Try asking:</div>
+              <ul>
+                <li onClick={() => setQuestion('What’s the difference between “I have eaten” and “I had eaten”?')}>What’s the difference between “I have eaten” and “I had eaten”?</li>
+                <li onClick={() => setQuestion('When do I use “a” vs “an”?')}>When do I use “a” vs “an”?</li>
+                <li onClick={() => setQuestion('Why do we say “much money” but “many apples”?')}>Why do we say “much money” but “many apples”?</li>
+              </ul>
+            </div>
+            <div className="centered-input">
+              <textarea
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                placeholder="Please enter your grammar questions here..."
+                rows={4}
+                disabled={isLoading || !userId}
+              />
+              <button 
+                onClick={handleSubmit}
+                disabled={isLoading || !question.trim() || !userId}
+              >
+                {isLoading ? 'Sending...' : 'Ask Question'}
+              </button>
+            </div>
           </div>
         ) : (
           messages.map((msg, idx) => (
@@ -162,18 +216,31 @@ const GrammarQA = ({ selectedLanguage, userId }) => {
         )}
         <div ref={chatEndRef} />
       </div>
-      <form className="chatgpt-qa-inputbar" onSubmit={handleSubmit}>
-        <textarea
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Please enter your questions here..."
-          rows={1}
-          disabled={isLoading || !userId}
-        />
-        <button type="submit" disabled={isLoading || !question.trim() || !userId}>
-          {isLoading ? 'Sending...' : 'Send'}
-        </button>
-      </form>
+      {messages.length > 0 && (
+        <>
+         <div className="example-questions" style={{marginBottom: 8}}>
+         <span className="example-title">Try asking:</span>
+         <ul style={{display:'flex',gap:'16px',padding:0,margin:0,listStyle:'none'}}>
+           <li style={{cursor:'pointer'}} onClick={() => setQuestion('What’s the difference between “I have eaten” and “I had eaten”?')}>What’s the difference between “I have eaten” and “I had eaten”?</li>
+           <li style={{cursor:'pointer'}} onClick={() => setQuestion('When do I use “a” vs “an”?')}>When do I use “a” vs “an”?</li>
+           <li style={{cursor:'pointer'}} onClick={() => setQuestion('Why do we say “much money” but “many apples”?')}>Why do we say “much money” but “many apples”?</li>
+         </ul>
+       </div>
+        <form className="chatgpt-qa-inputbar" onSubmit={handleSubmit}>
+         
+          <textarea
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="Please enter your questions here..."
+            rows={1}
+            disabled={isLoading || !userId}
+          />
+          <button type="submit" disabled={isLoading || !question.trim() || !userId}>
+            {isLoading ? 'Sending...' : 'Send'}
+          </button>
+        </form>
+        </>
+      )}
     </div>
   );
 };

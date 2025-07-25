@@ -1,5 +1,5 @@
 .personal-center {
-  max-width: 600px;
+  width: 80%;
   margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
@@ -61,7 +61,7 @@
   color: #555;
 }
 .profile-field label{
-  width: 100px;
+   flex:0.2;
 }
 .field-content {
   flex: 1;
@@ -70,15 +70,15 @@
   gap: 10px;
 }
 .field-content input{
-  flex: 0.5; /* 让input变窄 */
-  padding: 8px 12px;
+  flex: 1; /* 让input变窄 */
+  padding: 8px 20px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 16px;
 }
 
 .field-content span {
-  flex: 0.5; /* 让span变窄 */
+  flex: 1; /* 让span变窄 */
   padding: 8px 0;
   color: #666;
 }
@@ -114,8 +114,8 @@
 
 .edit-field-btn {
   padding: 6px 12px;
-  border: 1px solid #007bff;
-  background-color: #007bff;
+  border: 1px solid #4A90E2;
+  background-color: #4A90E2;
   color: white;
   border-radius: 4px;
   cursor: pointer;
@@ -154,7 +154,7 @@
   max-width: 200px; /* 保持最大宽度限制 */
 }
 .save-btn {
-  background-color: #007bff;
+  background-color: #4A90E2;
   color: white;
  
 }
@@ -181,7 +181,10 @@
 }
 
 .change-password-btn {
-  background-color: #007bff;
+  background-color: #4A90E2;
+  display: block;
+  margin: 0 auto;
+  
   color: white;
   flex: 1; /* 让按钮充满可用宽度 */
   max-width: 200px; /* 限制最大宽度 */
@@ -265,6 +268,12 @@
     flex: none; /* 在移动端取消flex，使用固定宽度 */
   }
 }
+   
+  .field-actions .save-btn.small,
+  .field-actions .cancel-btn.small
+  {
+    width: 50%;
+  }
 
 /* 大屏幕优化 */
 @media (min-width: 1200px) {
@@ -272,6 +281,16 @@
     max-width: 600px; /* 在大屏幕上限制最大宽度 */
     margin-left: auto;
     margin-right: auto;
+  }
+
+  .profile-field label{
+    width: 200px;
+  }
+
+
+
+  .password-field label{
+    width: 50%;
   }
   
   .change-password-btn,
