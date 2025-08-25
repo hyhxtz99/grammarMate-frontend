@@ -208,7 +208,7 @@ const GrammarQA = ({ selectedLanguage, userId }) => {
                   disabled={translatingIdx === idx}
                   style={{ marginLeft: 8 }}
                 >
-                  {translatingIdx === idx ? '翻译中...' : '翻译'}
+                  {translatingIdx === idx ? 'translating...' : 'translate'}
                 </button>
               )}
             </div>

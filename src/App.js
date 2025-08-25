@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter , Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import Navbar from './components/Navbar.jsx';
 import HomePage from './components/Home.jsx';
@@ -20,14 +20,12 @@ function App() {
   const [hasSelectedLanguage,setHasSelectedLanguage]=useState(false)
 
   return (
-    // <BrowserRouter>
+ 
     <div className="app-container">
       {isLoggedIn && (
        <>
           <Navbar />
-        
         </>
-    
       )}
       <div className="content-container">
         <Routes>
@@ -43,7 +41,6 @@ function App() {
             }
           />
           <Route path="/register" element={<RegisterPage />} />
-
           {/* 受保护路由 */}
           <Route
             path="/"
@@ -83,7 +80,6 @@ function App() {
               <Navigate to="/login" />
             )
           }
-          
           />
           <Route
             path="/personal"
@@ -126,7 +122,6 @@ function App() {
         </Routes>
       </div>
     </div>
-  // </BrowserRouter>
   );
 }
 

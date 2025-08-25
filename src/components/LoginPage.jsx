@@ -7,7 +7,6 @@ function LoginPage({ setIsLoggedIn,username,setUsername,setUserId }) {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    // 设置页面背景
     useEffect(() => {
         document.body.classList.add('login-background');
         return () => {
@@ -46,17 +45,14 @@ function LoginPage({ setIsLoggedIn,username,setUsername,setUserId }) {
       <div className='login-page'></div>
       <div className='container' >
         <h2>Welcome to GrammarMate!</h2>
-        
         <input
           className='username'
-         
           type="text"
           placeholder="Username"
           value={username}
           onChange={e => setUsername(e.target.value)}
         />
         <input className='password'
-       
           type="password"
           placeholder="Password"
           value={password}
@@ -64,7 +60,6 @@ function LoginPage({ setIsLoggedIn,username,setUsername,setUserId }) {
         />
         <button  onClick={handleLogin}>Login</button>
         <button  onClick={() => navigate('/register')}>Register</button>
-
       </div>
     </div>
   );

@@ -177,7 +177,7 @@ function PersonalCenter({ username,setSelectedLanguage, userId, setIsLoggedIn, s
 
   return (
     <div className="personal-center">
-      <h2>Personal Center</h2>
+     
       {message && (
         <div className={`message ${message.includes('successfully') ? 'success' : 'error'}`}>
           {message}

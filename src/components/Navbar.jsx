@@ -5,6 +5,7 @@ import './Navbar.css';
 
 function Navbar() {
   const location = useLocation();
+
   const [collapsed, setCollapsed] = useState(false);
   const toggleNavbar = () => setCollapsed(c => !c);
 

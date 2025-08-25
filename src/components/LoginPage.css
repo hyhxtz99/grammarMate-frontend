@@ -15,8 +15,7 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    /* background-clip: cover; */
-    height: 100vh; /* 改为100vh，确保不超出视口高度 */
+    height: 100vh; 
     margin: 0;
     padding: 0;
     position: fixed;

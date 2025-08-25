@@ -13,8 +13,7 @@ const Home = ({ hasSelectedLanguage, selectedLanguage,setSelectedLanguage,setHas
   return (
     <div className="home">
        <div className='content'>
-      <h1 className='slogan'>Speak Smarter. Write Better.</h1>
-     
+      <h1 className='slogan'>Fix it. Track it. Master it.</h1>
       <div className="mother-language">
           <span className="arrow-pointing">→</span>
           Your mother language:&nbsp;
@@ -48,14 +47,10 @@ const Home = ({ hasSelectedLanguage, selectedLanguage,setSelectedLanguage,setHas
           </select>
         </div>
       {hasSelectedLanguage && (
-        <p className="journey-text">You can correct your grammar and pronunciation here. Please choose the function from the navigation bar and start your journey.</p>
+        <p className="journey-text">You can correct your grammar here. Please choose the function from the navigation bar and start your journey.</p>
       )}
-
       </div>
-
     </div>
   );
 };
-
-
 export default Home;

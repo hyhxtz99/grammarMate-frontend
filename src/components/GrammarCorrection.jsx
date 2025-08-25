@@ -9,8 +9,6 @@ const GrammarCorrection = ({ selectedLanguage, userId }) => {
   const [translatedResult, setTranslatedResult] = useState(null);
   const [showTooltip, setShowTooltip] = useState(false);
 
-  
-
   const startRecording = async () => {
     try {
       const response = await fetch('http://localhost:5000/api/speech/start', {
@@ -75,8 +73,9 @@ const GrammarCorrection = ({ selectedLanguage, userId }) => {
         body: JSON.stringify({ text, user_id: userId })
       });
       const data = await response.json();
-      if(JSON.stringify(data['errors']) === JSON.stringify(['none'])){
-        setResult(data.explanations);
+      console.log('data.errors:', data);
+      if(JSON.stringify(data['grammar_errors']) ===JSON.stringify(['none'])){
+        setResult('correct');
       } else {
         // 当有错误时，组合explanations和corrected_sentence
         const explanations = Array.isArray(data.explanations) ? data.explanations.join(' ') : data.explanations;
@@ -126,11 +125,11 @@ const GrammarCorrection = ({ selectedLanguage, userId }) => {
       alert('error in translation');
     }
   };
-  console.log(result)
+
   return (
     <div className="setence-correction-wrapper">
     <div className="grammar-container">
-      <h2>Sentence Correction</h2>
+      {/* <h2>Sentence Correction</h2> */}
      
       <div className="speech-input">
         <div className="tooltip-wrapper">
