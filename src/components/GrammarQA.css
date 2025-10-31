@@ -121,6 +121,23 @@
   color: #4A90E2;
 }
 
+.preview-chat-btn {
+  background: transparent;
+  color: #fff;
+  border: 1px solid #fff;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-right: 8px;
+}
+
+.preview-chat-btn:hover {
+  background: #fff;
+  color: #4A90E2;
+}
+
 .empty-chat {
   display: flex;
   flex-direction: column;

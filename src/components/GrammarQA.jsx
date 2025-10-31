@@ -1,4 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { downloadProtectedPDF } from '../utils/pdfGenerator';
+import { downloadSimplePDF } from '../utils/simplePDF';
+import { getStoredToken } from '../utils/auth';
+import PDFPreviewModal from './PDFPreviewModal';
 import './GrammarQA.css';
 
 function getStorageKey(userId) {
@@ -19,8 +23,11 @@ const GrammarQA = ({ selectedLanguage, userId }) => {
   const [messages, setMessages] = useState([]); // 初始化为空数组
   const [isLoading, setIsLoading] = useState(false);
   const [translatingIdx, setTranslatingIdx] = useState(null); // 当前正在翻译的消息索引
+  const [showPDFPreview, setShowPDFPreview] = useState(false);
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   const chatEndRef = useRef(null);
   const prevMsgLenRef = useRef(0);
+  const eventSourceRef = useRef(null);
 
   // 当userId改变时，加载对应用户的聊天记录
   useEffect(() => {
@@ -54,36 +61,60 @@ const GrammarQA = ({ selectedLanguage, userId }) => {
     if (!question.trim() || !userId) return;
     
     const userMsg = { role: 'user', content: question };
-    setMessages((prev) => [...prev, userMsg]);
+    setMessages((prev) => [...prev, userMsg, { role: 'assistant', content: '' }]);
     setIsLoading(true);
     setQuestion('');
-    
+
+    // 关闭上一条未完成的SSE
+    if (eventSourceRef.current) {
+      try { eventSourceRef.current.close(); } catch {}
+      eventSourceRef.current = null;
+    }
+
     try {
-      const response = await fetch('http://localhost:5000/api/grammar/qa', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: userMsg.content })
+      // Get JWT token for authentication
+      const token = getStoredToken();
+      const url = `http://localhost:5000/api/grammar/qa/stream?q=${encodeURIComponent(userMsg.content)}${token ? `&token=${encodeURIComponent(token)}` : ''}`;
+      const es = new EventSource(url);
+      eventSourceRef.current = es;
+
+      es.addEventListener('start', () => {
+        // no-op, assistant message placeholder already added
       });
-      const data = await response.json();
-      let answerMsg = { role: 'assistant', content: data.answer };
-      
-      // 如果需要翻译
-      if (selectedLanguage && selectedLanguage !== 'en') {
-        const transResp = await fetch('http://localhost:5000/api/translate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: data.answer, to_lang: selectedLanguage })
+
+      es.onmessage = (evt) => {
+        const chunk = evt.data || '';
+        if (!chunk) return;
+        setMessages((prev) => {
+          if (prev.length === 0) return prev;
+          const updated = [...prev];
+          const lastIdx = updated.length - 1;
+          if (updated[lastIdx].role === 'assistant') {
+            updated[lastIdx] = { ...updated[lastIdx], content: (updated[lastIdx].content || '') + (updated[lastIdx].content ? ' ' : '') + chunk };
+          }
+          return updated;
         });
-        const transData = await transResp.json();
-        if (transData.translated_text) {
-          answerMsg = { ...answerMsg, translated: transData.translated_text };
-        }
-      }
-      setMessages((prev) => [...prev, answerMsg]);
+      };
+
+      es.addEventListener('end', () => {
+        setIsLoading(false);
+        try { es.close(); } catch {}
+        eventSourceRef.current = null;
+      });
+
+      es.addEventListener('error', (evt) => {
+        setIsLoading(false);
+        setMessages((prev) => [...prev, { role: 'assistant', content: '流式传输出错，请重试。' }]);
+        try { es.close(); } catch {}
+        eventSourceRef.current = null;
+      });
     } catch (error) {
-      setMessages((prev) => [...prev, { role: 'assistant', content: '处理问题时出错' }]);
-    } finally {
       setIsLoading(false);
+      setMessages((prev) => [...prev, { role: 'assistant', content: '无法连接到服务器。' }]);
+      if (eventSourceRef.current) {
+        try { eventSourceRef.current.close(); } catch {}
+        eventSourceRef.current = null;
+      }
     }
   };
 
@@ -115,28 +146,92 @@ const GrammarQA = ({ selectedLanguage, userId }) => {
     }
   };
 
-  // 导出问答记录为 txt 文件
-  const handleExport = () => {
-    if (!messages.length) return;
-    let content = '';
-    messages.forEach((msg, idx) => {
-      const role = msg.role === 'user' ? 'User' : 'AI';
-      content += `${role}: ${msg.content}\n`;
-      if (msg.translated) {
-        content += `Translation: ${msg.translated}\n`;
-      }
-      content += '\n';
-    });
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'grammar_qa_history.txt';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  // 显示PDF预览
+  const handlePreviewPDF = () => {
+    if (!messages.length) {
+      alert('没有对话记录可以预览');
+      return;
+    }
+    setShowPDFPreview(true);
   };
+
+  // 处理PDF下载
+  const handleDownloadPDF = async (pdfBlob) => {
+    try {
+      // 创建下载链接
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `GrammarMate_QA_${new Date().toISOString().slice(0, 10)}.pdf`;
+      
+      // 触发下载
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // 清理URL
+      URL.revokeObjectURL(url);
+      
+      alert('PDF下载成功！');
+    } catch (error) {
+      console.error('PDF下载失败:', error);
+      alert('PDF下载失败，请重试');
+    }
+  };
+
+  // 导出问答记录为带水印的PDF文件（直接下载）
+  const handleExport = async () => {
+    if (!messages.length) return;
+    
+    try {
+      console.log('Starting PDF export...', messages);
+      
+      // Try simple PDF first (more reliable)
+      let result;
+      try {
+        result = downloadSimplePDF(messages, {
+          filename: `GrammarMate_QA_${new Date().toISOString().slice(0, 10)}.pdf`
+        });
+      } catch (simpleError) {
+        console.warn('Simple PDF failed, trying advanced version:', simpleError);
+        
+        // Fallback to advanced PDF
+        result = await downloadProtectedPDF(messages, {
+          title: 'GrammarMate Q&A Session',
+          watermarkText: 'GrammarMate',
+          watermarkOptions: {
+            opacity: 0.1,
+            fontSize: 20,
+            angle: -45,
+            color: '#cccccc',
+            spacing: 100
+          },
+          userId: userId,
+          filename: `GrammarMate_QA_${new Date().toISOString().slice(0, 10)}.pdf`
+        });
+      }
+      
+      if (result && result.success) {
+        alert(`PDF exported successfully: ${result.filename}`);
+      } else {
+        console.error('PDF export failed:', result);
+        alert(`Export failed: ${result?.error || result?.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      alert(`Failed to export PDF: ${error.message}`);
+    }
+  };
+
+  // 组件卸载或切换时，清理SSE连接
+  useEffect(() => {
+    return () => {
+      if (eventSourceRef.current) {
+        try { eventSourceRef.current.close(); } catch {}
+        eventSourceRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div className="chatgpt-qa-container">
@@ -152,11 +247,18 @@ const GrammarQA = ({ selectedLanguage, userId }) => {
               🗑️ Clear
             </button>
             <button
+              className="preview-chat-btn"
+              onClick={handlePreviewPDF}
+              title="Preview PDF with watermark protection"
+            >
+              👁️ Preview PDF
+            </button>
+            <button
               className="export-chat-btn"
               onClick={handleExport}
-              title="Export chat history"
+              title="Export as PDF with GrammarMate watermark"
             >
-              ⬇️ Export
+              📄 Export PDF
             </button>
           </div>
         )}
@@ -241,6 +343,16 @@ const GrammarQA = ({ selectedLanguage, userId }) => {
         </form>
         </>
       )}
+      
+      {/* PDF预览模态框 */}
+      <PDFPreviewModal
+        isOpen={showPDFPreview}
+        onClose={() => setShowPDFPreview(false)}
+        messages={messages}
+        userId={userId}
+        sessionId={sessionId}
+        onDownload={handleDownloadPDF}
+      />
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { authenticatedFetch } from '../utils/auth';
 import './GrammarCorrection.css';
 
 const GrammarCorrection = ({ selectedLanguage, userId }) => {
@@ -11,7 +12,7 @@ const GrammarCorrection = ({ selectedLanguage, userId }) => {
 
   const startRecording = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/speech/start', {
+      const response = await authenticatedFetch('/api/speech/start', {
         method: 'POST'
       });
       if (response.ok) {
@@ -29,11 +30,8 @@ const GrammarCorrection = ({ selectedLanguage, userId }) => {
 
   const stopRecording = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/speech/stop', {
+      const response = await authenticatedFetch('/api/speech/stop', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify({ user_id: userId })
       });
       const data = await response.json();
@@ -65,11 +63,8 @@ const GrammarCorrection = ({ selectedLanguage, userId }) => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/text', {
+      const response = await authenticatedFetch('/api/text', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify({ text, user_id: userId })
       });
       const data = await response.json();

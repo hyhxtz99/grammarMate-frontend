@@ -184,7 +184,53 @@ html, body {
     overflow: hidden;
 }
 
-.username{
+/* GitHub登录相关样式 */
+.login-divider {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+}
 
- }    
+.login-divider::before,
+.login-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.3);
+    margin: 0 15px;
+}
+
+.github-login-btn {
+    background: linear-gradient(135deg, #24292e, #1a1e22) !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.github-login-btn:hover {
+    background: linear-gradient(135deg, #1a1e22, #0d1117) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(36, 41, 46, 0.4);
+}
+
+.github-icon {
+    font-size: 16px;
+}
+
+/* 响应式设计调整 */
+@media (max-width: 480px) {
+    .login-divider {
+        margin: 15px 0;
+    }
+    
+    .github-login-btn {
+        width: 180px !important;
+    }
+}
+
+ 
 

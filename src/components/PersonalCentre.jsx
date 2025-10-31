@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authenticatedFetch } from '../utils/auth';
 import './PersonalCentre.css';
 
 function PersonalCenter({ username,setSelectedLanguage, userId, setIsLoggedIn, setUsername, setUserId }) {
@@ -27,11 +28,12 @@ function PersonalCenter({ username,setSelectedLanguage, userId, setIsLoggedIn, s
 
   const fetchUserProfile = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/user/profile/${userId}`);
+      const response = await authenticatedFetch(`/api/user/profile/${userId}`);
       if (response.ok) {
         const data = await response.json();
         setProfile(data);
-        
+      } else {
+        console.error('Failed to fetch user profile:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
@@ -59,11 +61,8 @@ function PersonalCenter({ username,setSelectedLanguage, userId, setIsLoggedIn, s
     setLoading(true);
     try {
       const updatedProfile = { ...profile, [field]: newValue };
-      const response = await fetch(`http://localhost:5000/api/user/profile/${userId}`, {
+      const response = await authenticatedFetch(`/api/user/profile/${userId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify(updatedProfile)
       });
 
@@ -95,11 +94,8 @@ function PersonalCenter({ username,setSelectedLanguage, userId, setIsLoggedIn, s
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/user/password/${userId}`, {
+      const response = await authenticatedFetch(`/api/user/password/${userId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify(passwordData)
       });
 
